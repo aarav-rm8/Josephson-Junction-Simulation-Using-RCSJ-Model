@@ -1,0 +1,63 @@
+% Function Definition 
+
+s_ = @(phi_in) sin(phi_in + pi/3) + 0.5*sin(2*phi_in);
+%s_ = @(phi_in) sin(phi_in - pi/3) + 0.5*sin(2*phi_in);
+%Note: This is the functional form representation from the magnetic atom paper.
+
+
+% Defining External Parameters:
+Ic = 1E-7;
+
+Bc = 10; %Value chosen for ease of observation
+RC = .01;% Aribitrary value
+
+h_cross = 1.05457182E-34;
+e_ = 1.60217662E-19;
+
+A = [1 0 ; 0 Bc];
+B = [0 1 ; 0 -1];
+
+A_inv = inv(A);
+
+I_range1 = linspace(0,4E-7,1000);
+I_range2 = linspace((4E-7)-(4E-10),-4E-7,1999);
+I_range3 = linspace(-(4E-7)+(4E-10),0,999);
+I_range = [linspace(0,4E-7,1000),linspace((4E-7)-(4E-10),-4E-7,1999),linspace(-(4E-7)+(4E-10),0,999)];
+
+
+t_span = [0,1e2];
+
+dphis = [];
+
+zeta_ini = [0,0];
+zeta_c = zeta_ini;
+
+for I = I_range
+    diffz = @(t,z) A_inv*(B*z(:,1) - [0 ; s_(z(1,1))] + [0 ; I/Ic]);
+    [t_ , z_ ] = ode23s(diffz,t_span,zeta_c);
+    zeta_c = z_(length(z_),:);
+    dphis = [dphis zeta_c(2)];
+end
+
+V = dphis*h_cross*Bc/(2*e_*RC);
+
+%Calculation of efficiency
+[VcPlus,IcPlusInd] = max(diff(V));
+IcPlus =  I_range(IcPlusInd);
+[VcMinus,IcMinusInd] = min(diff(V));
+IcMinus =  I_range(IcMinusInd);
+eta = abs(IcPlus + IcMinus)/(abs(IcPlus) + abs(IcMinus));
+
+%I_V Characteristics obtained, lets plot!
+plot(V,I_range)
+hold on
+set(gca,'FontSize',20, 'FontName', 'Courier')
+title('I-V Characterists - RCSJ Model')
+xlabel('Voltage V (V)')
+ylabel('Current I (A)')
+str = "Efficiency = " + num2str(eta);
+dim = [.2 .5 .3 .3];
+annotation('textbox',dim,'String',str,'FitBoxToText','on');
+
+hold off
+
