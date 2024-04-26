@@ -3,9 +3,9 @@ message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Ratra"
   given-names: "Aarav"
-  orcid: "https://orcid.org/0000-0000-0000-0000"
+
 title: "Josephson-Junction-Simulation-Using-RCSJ-Model"
 version: 1.0.0
-doi: 10.5281/zenodo.1234
+
 date-released: 2024-04-25
 url: "https://github.com/aarav-rm8/Josephson-Junction-Simulation-Using-RCSJ-Model"
